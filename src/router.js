@@ -14,27 +14,39 @@ const mockUser = {
     }
 };
 
-router.post('/login', (req, res) => {
+router.post('/login', (req, res, next) => {
     const { username, password } = req.body;
 
     if (username !== mockUser.username || password !== mockUser.password) {
-        return res.status(401).json({ error: 'Invalid username or password.' });
+        
+        const err = new Error('Invalid username or password');
+        err.status = 'Fail';
+        err.statusCode = 404;
+        next(err);
+
+    } else {
+
+        const token = jwt.sign({ username }, jwtSecret);
+        res.json({ data: token });
+
     }
-
-    const token = jwt.sign({ username }, jwtSecret);
-
-    res.json({ data: token });
 });
 
-router.get('/profile', (req, res) => {
+router.get('/profile', (req, res, next) => {
+    
     try {
+
         const token = req.header('authorization');
         jwt.verify(token, jwtSecret);
-    } catch (error) {
-        return res.status(401).json({ error: 'Invalid token provided.' });
-    }
+        res.json({ data: mockUser.profile });
 
-    res.json({ data: mockUser.profile });
+    } catch (error) {
+
+        const err = new Error('Invalid token provided');
+        err.status = 'Fail';
+        err.statusCode = 401;
+        next(err)
+    }
 });
 
 module.exports = router;

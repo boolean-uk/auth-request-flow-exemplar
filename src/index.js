@@ -12,6 +12,21 @@ app.use(express.urlencoded({ extended: true }));
 const router = require('./router');
 app.use('/', router);
 
+// Error handling middleware
+app.use((error, req, res, next) => {
+
+    console.log("Error Handling Middleware called", req.path)
+
+    const statusCode = error.statusCode || 500;
+    const status = error.status || 'error';
+    const message = error.message || 'oops';
+  
+    res.status(statusCode).json({
+      status: status,
+      message: message
+    });
+})
+
 app.get('*', (req, res) => {
     res.json({ ok: true });
 });
