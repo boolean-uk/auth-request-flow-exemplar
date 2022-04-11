@@ -21,4 +21,15 @@ router.post('/login', (req, res) => {
   return res.json({ token });
 });
 
+router.get('/profile', (req, res) => {
+  try {
+    const token = req.headers.authorization.substring(7);
+    const decoded = jwt.verify(token, secretKey);
+    res.json({ decoded });
+  } catch (err) {
+    console.log(err);
+    return res.status(401).json({ err });
+  }
+});
+
 module.exports = router;
