@@ -16,9 +16,13 @@ const mockUser = {
 const secretKey = 'mysecretkey';
 
 router.post('/login', (req, res) => {
-  const payload = mockUser.username;
-  const token = jwt.sign(payload, secretKey);
-  return res.json({ token });
+  const { username, password } = req.body;
+  if (username === mockUser.username && password === mockUser.password) {
+    const token = jwt.sign(username, secretKey);
+    return res.json({ token });
+  } else {
+    return res.json({ error: 'Invalid username or password' });
+  }
 });
 
 router.get('/profile', (req, res) => {
